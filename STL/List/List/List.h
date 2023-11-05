@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <assert.h>
 namespace gao
 {
 	template <class T>
@@ -74,13 +75,48 @@ namespace gao
 		typedef ListNode<T> Node;
 		typedef ListIterator<T, T&,T*> iterator;
 		typedef ListIterator<T, const T&,const T*> const_iterator;
+		void empty_init()
+		{
+			_head = new Node;
+			_head->_prev = _head;
+			_head->_next = _head;
 
+			sz = 0;
+		}
 		list()
 		{
-			_head = new Node();
-			_head->_next = _head;
-			_head->_prev = _head;
-			sz = 0;
+			empty_init();
+		}
+		list(int n, const T& value = T())
+		{
+			empty_init();
+			for (int i = 0; i < n; i++)
+			{
+				push_back(value);
+			}
+		}
+		template <class Iterator>
+		list(Iterator first, Iterator last)
+		{
+			empty_init();
+			while (first != last)
+			{
+				push_back(*first);
+				first++;
+			}
+		}
+		list(const list<T>& l)
+		{
+			empty_init();
+			for (auto& e : l)
+			{
+				push_back(e);
+			}
+		}
+		list<T>& operator=(list<T> l)
+		{
+			swap(l);
+			return *this;
 		}
 		iterator begin()
 		{
@@ -128,15 +164,67 @@ namespace gao
 			NewNode->_next = cur;
 			cur->_prev = NewNode;
 			++sz;
-			return NewNode;
+			return iterator(NewNode);
 		}
 		iterator erase(iterator pos)
 		{
+			assert(pos != end());
+			Node* cur = pos._node;
+			Node* prev = cur->_prev;
+			prev->_next = cur-> _next;
+			cur->_next->_prev = prev;
+			delete cur;
+			--sz;
+			return iterator(prev->_next);
+		}
+		void pop_back()
+		{
+			erase(--end());
+		}
+		void pop_front()
+		{
+			erase(begin());
+		}
+		T& front()
+		{
+			assert(size() > 0);
+			return *begin();
+		}
+		const T& front()const
+		{
+			assert(size() > 0);
+			return *begin();
+		}
+		T& back()
+		{
+			assert(size() > 0);
+			return *(--end());
 
+		}
+		const T& back()const
+		{
+			assert(size() > 0);
+			return *(--end());
+		}
+		void swap(list<T>& l)
+		{
+			std::swap(_head, l._head);
+			std::swap(sz, l.sz);
+		}
+		void clear()
+		{
+			iterator it = begin();
+			while (it != end())
+			{
+				it = erase(it);
+			}
+			sz = 0;
 		}
 		~list()
 		{
-
+			clear();
+			delete _head;
+			_head = nullptr;
 		}
 	private:
 		Node* _head;
