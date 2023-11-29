@@ -73,6 +73,7 @@ int main()
 	FILE* fp = fopen("output.txt", "a+");
 	if (!fp)
 	{
+		
 		perror("output文件打开失败");
 		return -1;
 	}
