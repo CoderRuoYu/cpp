@@ -12,8 +12,10 @@ typedef struct Heap
 void AdjustDown(HPDataType* a, int size, int parents);
 //创建堆
 void HeapCreate(Heap* hp, HPDataType* a, int n);
+
 //堆的销毁
 void HeapDestory(Heap* hp);
+
 //删除堆顶元素
 void HeapPop(Heap* hp);
 

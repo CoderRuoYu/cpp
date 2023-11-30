@@ -27,7 +27,7 @@ void HeapCreate(Heap* hp, HPDataType* a, int n)
 	hp->_size = n;
 	hp->_capacity = n;
 	hp->_a = new HPDataType[n];
-	memmove(hp->_a, a, n);
+	memmove(hp->_a, a, n * sizeof(HPDataType));
 	for (int i = (n - 1 - 1) / 2; i >= 0; i--)
 	{
 		AdjustDown(hp->_a, hp->_size, i);
@@ -60,5 +60,17 @@ HPDataType HeapTop(Heap* hp)
 	assert(hp && hp->_size > 0);
 	return hp->_a[0];
 }
+void HeapPop(Heap* hp)
+{
+	if (hp->_size == 1)hp->_size--;
+	else
+	{
+		std::swap(hp->_a[0], hp->_a[hp->_size - 1]);
+		hp->_size--;
+		AdjustDown(hp->_a, hp->_size, 0);
+	}
+	
+}
+
 
 
