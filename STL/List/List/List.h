@@ -75,6 +75,7 @@ namespace gao
 		typedef ListNode<T> Node;
 		typedef ListIterator<T, T&,T*> iterator;
 		typedef ListIterator<T, const T&,const T*> const_iterator;
+		typedef Reverse_iterator<iterator> reverse_iterator;
 		void empty_init()
 		{
 			_head = new Node;
@@ -126,6 +127,14 @@ namespace gao
 		{
 			return iterator(_head);
 		}
+		/*reverse_iterator rbegin()
+		{
+			return _head->_prev
+		}
+		reverse_iterator rend()
+		{
+			return _head->_prev
+		}*/
 		const_iterator begin() const
 		{
 			return const_iterator(_head->_next);
