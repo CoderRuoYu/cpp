@@ -1,8 +1,17 @@
 #pragma once
 #include <iostream>
+#include "reverse_iterator.h"
 #include <assert.h>
 namespace gao
 {
+	struct test
+	{
+		test(int b = 0)
+		{
+			a = b;
+		}
+		int a = 0;
+	};
 	template <class T>
 	struct ListNode
 	{
@@ -75,7 +84,8 @@ namespace gao
 		typedef ListNode<T> Node;
 		typedef ListIterator<T, T&,T*> iterator;
 		typedef ListIterator<T, const T&,const T*> const_iterator;
-		typedef Reverse_iterator<iterator> reverse_iterator;
+		typedef Reverse_iterator<iterator, T&, T*> reverse_iterator;
+		typedef Reverse_iterator<iterator, const T&, const T*> const_reverse_iterator;
 		void empty_init()
 		{
 			_head = new Node;
@@ -127,13 +137,21 @@ namespace gao
 		{
 			return iterator(_head);
 		}
-		/*reverse_iterator rbegin()
+		reverse_iterator rbegin()
 		{
-			return _head->_prev
+			return end();
 		}
 		reverse_iterator rend()
 		{
-			return _head->_prev
+			return iterator(_head->_next);
+		}
+		/*const_reverse_iterator rbegin()
+		{
+			return iterator(_head);
+		}
+		const_reverse_iterator rend()
+		{
+			return iterator(_head->_next);
 		}*/
 		const_iterator begin() const
 		{

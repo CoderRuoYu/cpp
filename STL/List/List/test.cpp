@@ -6,52 +6,29 @@ using namespace std;
 
 void test01()
 {
-	gao::list<int> test;
-	test.push_front(1);
-	test.push_front(2);
-	test.push_front(3);
-	test.push_front(4);
-	test.push_back(9);
-	test.push_back(10);
-	test.push_back(11);
-	test.push_back(12);
-	gao::list<int>::iterator i = test.begin();
-	while (i != test.end())
+	gao::list<int> temp;
+	temp.push_back(1);
+	temp.push_back(2);
+	temp.push_back(3);
+	temp.push_back(3);
+	temp.push_back(3);
+	for (gao::list<int>::reverse_iterator i = temp.rbegin(); i != temp.rend(); i++)
 	{
 		cout << *i << ' ';
-		i++;
 	}
 	cout << endl;
-
-	i = test.begin();
-	for (int j = 0; j < 2; j++)
+}
+void test05()
+{
+	gao::list<gao::test> temp;
+	temp.push_back(gao::test(0));
+	temp.push_back(gao::test(1));
+	temp.push_back(gao::test(2));
+	for (gao::list<gao::test>::iterator i = temp.begin(); i != temp.end(); i++)
 	{
-		i++;
-	}
-
-	gao::list<int>::iterator temp = test.erase(i);
-
-
-
-	gao::list<int>::iterator a = test.begin();
-	while (a != test.end())
-	{
-		cout << *a << ' ';
-		a++;
+		cout << i->a << ' ';
 	}
 	cout << endl;
-
-	test.erase(temp);
-	gao::list<int>::iterator b = test.begin();
-
-	while (b != test.end())
-	{
-		cout << *b << ' ';
-		b++;
-	}
-
-	cout << endl;
-
 }
 void test02()
 {
@@ -108,7 +85,7 @@ void test03()
 }
 int main()
 {
-	test03();
+	test05();
 	
 	return 0;
 }
