@@ -21,11 +21,23 @@ void test02()
 		cout << t.top() << ' ';
 		t.pop();
 	}
-	
+}
+void test03()
+{
+	int arr[] = { 8,5,7,3,6,9,12,20 };
+	gao::priority_queue<int, vector<int>, gao::greater<int>> t(arr, arr + sizeof(arr) / sizeof(arr[0]));
+	t.push(-44);
+	t.push(44);
+	while (!t.empty())
+	{
+		cout << t.top() << ' ';
+		t.pop();
+	}
+
 }
 int main()
 {
-	test02();
+	test03();
 
 	return 0;
 }

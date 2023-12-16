@@ -1,7 +1,23 @@
 #pragma once
 namespace gao
 {
-	template <class T, class Container = vector<T>, class Compare = less<T>>
+	template <class T>
+	struct less
+	{
+		bool operator()(const T& a, const T& b)
+		{
+			return a < b;
+		}
+	};
+	template <class T>
+	struct greater
+	{
+		bool operator()(const T& a, const T& b)
+		{
+			return a > b;
+		}
+	};
+	template <class T, class Container = vector<T>, class Compare = greater<T>>
 	class priority_queue
 	{
 	public:
@@ -14,7 +30,7 @@ namespace gao
 			:c(first,last)
 		{
 			//向下调整
-			if (c, size() > 1)
+			if (c.size() > 1)
 			{
 				for (int i = (c.size() - 1 - 1) / 2; i >= 0; i--)
 				{
@@ -52,11 +68,11 @@ namespace gao
 			int child = 2 * parent + 1;
 			while (child < c.size())
 			{
-				if (child + 1 < c.size() && c[child] < c[child + 1])
+				if (child + 1 < c.size() && comp(c[child], c[child + 1]))
 				{
 					child = child + 1;
 				}
-				if (c[parent] < c[child])
+				if (comp(c[parent], c[child]))
 				{
 					swap(c[parent], c[child]);
 				}
@@ -73,7 +89,7 @@ namespace gao
 			int parent = (child - 1) / 2;
 			while (parent >= 0)
 			{
-				if (c[child] > c[parent])
+				if (comp(c[parent], c[child]))
 				{
 					swap(c[child], c[parent]);
 				}
