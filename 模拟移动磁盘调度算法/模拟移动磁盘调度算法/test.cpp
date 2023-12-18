@@ -4,6 +4,7 @@
 #include <time.h>
 #include <vector>
 #include <algorithm>
+#include <utility>
 using namespace std;
 const int maxRightValue = 199;
 const int minLeftValue = 0;
@@ -91,7 +92,7 @@ int FindLarger(vector<int>& t, int pos)
 	return index;
 }
 //假设磁盘指针总是向右移动
-int SCAN(vector<int> t, int pos)
+pair<int, int> SCAN(vector<int> t, int pos)
 {
 	int sum = 0;
 	vector<int> left, right;
@@ -125,7 +126,10 @@ int SCAN(vector<int> t, int pos)
 		}
 	}
 	Show("SCAN", show);
-	return sum;
+	pair<int, int> res;
+	res.first = sum;
+	res.second = pos;
+	return res;
 }
 int CSCAN(vector<int> t, int pos)
 {
@@ -162,11 +166,15 @@ int CSCAN(vector<int> t, int pos)
 
 	return sum;
 }
-
+//将前50个请求划分为当前正在进行的队列，后50个请求划分为扫描期间请求磁盘调度的进程
 int FSCAN(vector<int> t, int pos)
 {
 	int sum = 0;
-
+	vector<int> t1(t.begin(), t.begin() + 50);
+	vector<int> t2(t.begin() + 50, t.begin() + 100);
+	const pair<int, int>& temp = SCAN(t1, pos);
+	sum += temp.first;
+	sum += SCAN(t2, temp.second).first;
 	return sum;
 }
 int main()
@@ -179,9 +187,9 @@ int main()
 
 	cout << FCFS(randValue, pos) << endl;
 	cout << SSTF(randValue, pos) << endl;
-	cout << SCAN(randValue, pos) << endl;
+	cout << SCAN(randValue, pos).first << endl;
 	cout << CSCAN(randValue, pos) << endl;
-	//cout << FSCAN(randValue, pos) << endl;
+	cout << FSCAN(randValue, pos) << endl;
 
 
 
