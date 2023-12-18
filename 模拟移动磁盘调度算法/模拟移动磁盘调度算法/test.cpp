@@ -5,17 +5,20 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
+const int maxRightValue = 199;
+const int minLeftValue = 0;
 void getRandomNumber(vector<int>& randValue, int& pos)
 {
-	srand((unsigned)time(NULL));
+	
 	for (int i = 0; i < 100; i++)
 		randValue.push_back(rand() % 200);
 	pos = rand() % 200;
 }
 //输入 请求访问序列和磁头所在位置
 //输出 移动磁道数
-void show(vector<int>& t)
+void Show(const string& str, const vector<int>& t)
 {
+	cout << str << "的访问序列为:";
 	for (int i = 0; i < t.size(); i++)
 	{
 		if (i != t.size() - 1)
@@ -24,77 +27,162 @@ void show(vector<int>& t)
 			cout << t[i] << endl;
 	}
 }
-int FindLarger(vector<int>& t, int n)
-{
-	int l = 0;
-	int r = t.size() - 1;
 
-	while (l < r)
-	{
-		int mid = (l + r) >> 1;
-		if (t[mid] >= n)r = mid;
-		else l = mid + 1;
-	}
-	return l;
-
-}
-//int FindSmaller(vector<int>& t, int n)
-//{
-//	int l = 0;
-//	int r = t.size() - 1;
-//	while (l < r)
-//	{
-//		int mid = (l + r + 1) >> 1;
-//		if (t[mid] <= n)l = mid;
-//		else r = mid - 1;
-//	}
-//	return l;
-//}
-
-int FCFS(vector<int> t, int pos)
+int FCFS(const vector<int>& t, int pos)
 {
 	int sum = 0;
-	cout << "FCFS的访问序列为:";
-	show(t);
+	Show("FCFS", t);
 	for (int i = 0; i < t.size(); i++)
 	{
-		sum += t[i] > pos ? t[i] - pos : pos - t[i];
+		sum += abs(pos - t[i]);
 		pos = t[i];
 	}
-	cout << endl;
 	return sum;
+}
+int findClose(const vector<int>& t, int pos)
+{
+	int minDistance = INT_MAX;
+	int index = -1;
+	for (int i = 0; i < t.size(); i++)
+	{
+		if (t[i] == -1)continue;
+		int distance = abs(pos - t[i]);
+		if (minDistance > distance)
+		{
+			minDistance = distance;
+			index = i;
+		}
+	}
+	return index;
 }
 int SSTF(vector<int> t, int pos)
 {
 	vector<int> show;
 	int sum = 0;
-	sort(t.begin(), t.end());
-	int n = FindLarger(t, pos);
-	while (!t.empty())
+	for (int i = 0; i < t.size(); i++)
 	{
-		
+		int index = findClose(t, pos);
+		if (index == -1)
+		{
+			break;
+		}
+		else
+		{
+			show.push_back(t[index]);
+			sum += abs(pos - t[index]);
+			pos = t[index];
+			t[index] = -1;
+		}
 	}
+	Show("SSTF", show);
+	return sum;
 }
+int FindLarger(vector<int>& t, int pos)
+{
+	int index = -1;
+	for (int i = 0; i < t.size(); i++)
+	{
+		if (pos <= t[i])
+		{
+			index = i;
+			break;
+		}
+	}
+	return index;
+}
+//假设磁盘指针总是向右移动
 int SCAN(vector<int> t, int pos)
 {
+	int sum = 0;
+	vector<int> left, right;
+	vector<int> show;
+	for (auto e : t)
+	{
+		if (e < pos)
+		{
+			left.push_back(e);
+		}
+		else
+		{
+			right.push_back(e);
+		}
+	}
+	sort(left.begin(), left.end());
+	sort(right.begin(), right.end());
+	for (auto e : right)
+	{
+		show.push_back(e);
+	}
+	sum += maxRightValue - pos;
+	if (!left.empty())
+	{
+		sum += maxRightValue - left[0];
+		reverse(left.begin(), left.end());
 
+		for (auto e : left)
+		{
+			show.push_back(e);
+		}
+	}
+	Show("SCAN", show);
+	return sum;
 }
 int CSCAN(vector<int> t, int pos)
 {
+	int sum = 0;
+	vector<int> left, right;
+	vector<int> show;
+	for (auto e : t)
+	{
+		if (e < pos)
+		{
+			left.push_back(e);
+		}
+		else
+		{
+			right.push_back(e);
+		}
+	}
+	sort(left.begin(), left.end());
+	sort(right.begin(), right.end());
+	for (auto e : right)
+	{
+		show.push_back(e);
+	}
+	sum += maxRightValue - pos + 200;
+	if (!left.empty())
+	{
+		for (auto e : left)
+		{
+			show.push_back(e);
+		}
+		sum += left.back();
+	}
+	Show("CSCAN", show);
 
+	return sum;
 }
+
 int FSCAN(vector<int> t, int pos)
 {
+	int sum = 0;
 
+	return sum;
 }
 int main()
 {
+
 	int pos = 0;
 	vector<int> randValue;
+	srand((unsigned)time(NULL));
 	getRandomNumber(randValue, pos);
 
 	cout << FCFS(randValue, pos) << endl;
 	cout << SSTF(randValue, pos) << endl;
+	cout << SCAN(randValue, pos) << endl;
+	cout << CSCAN(randValue, pos) << endl;
+	//cout << FSCAN(randValue, pos) << endl;
+
 
 
 	return 0;
