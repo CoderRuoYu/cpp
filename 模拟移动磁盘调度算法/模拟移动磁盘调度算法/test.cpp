@@ -6,8 +6,10 @@
 #include <algorithm>
 #include <utility>
 using namespace std;
-const int maxRightValue = 199;
-const int minLeftValue = 0;
+const int maxRightValue = 199;//磁头移动的最右边界值
+const int minLeftValue = 0;//磁头移动的最左边界值
+vector<int> FSCAN_SHOW;//存放FSCAN_SHOW算法的访问顺序
+
 void getRandomNumber(vector<int>& randValue, int& pos)
 {
 	
@@ -92,7 +94,7 @@ int FindLarger(vector<int>& t, int pos)
 	return index;
 }
 //假设磁盘指针总是向右移动
-pair<int, int> SCAN(vector<int> t, int pos)
+pair<int, int> SCAN(vector<int> t, int pos, int flag = 1)
 {
 	int sum = 0;
 	vector<int> left, right;
@@ -125,7 +127,17 @@ pair<int, int> SCAN(vector<int> t, int pos)
 			show.push_back(e);
 		}
 	}
-	Show("SCAN", show);
+	if (flag)
+	{
+		Show("SCAN", show);
+	}
+	else
+	{
+		for (auto e : show)
+		{
+			FSCAN_SHOW.push_back(e);
+		}
+	}
 	pair<int, int> res;
 	res.first = sum;
 	res.second = pos;
@@ -167,14 +179,16 @@ int CSCAN(vector<int> t, int pos)
 	return sum;
 }
 //将前50个请求划分为当前正在进行的队列，后50个请求划分为扫描期间请求磁盘调度的进程
+
 int FSCAN(vector<int> t, int pos)
 {
 	int sum = 0;
 	vector<int> t1(t.begin(), t.begin() + 50);
 	vector<int> t2(t.begin() + 50, t.begin() + 100);
-	const pair<int, int>& temp = SCAN(t1, pos);
+	const pair<int, int>& temp = SCAN(t1, pos, 0);
 	sum += temp.first;
-	sum += SCAN(t2, temp.second).first;
+	sum += SCAN(t2, temp.second, 0).first;
+	Show("FSCAN", FSCAN_SHOW);
 	return sum;
 }
 int main()
@@ -185,13 +199,19 @@ int main()
 	srand((unsigned)time(NULL));
 	getRandomNumber(randValue, pos);
 
-	cout << FCFS(randValue, pos) << endl;
-	cout << SSTF(randValue, pos) << endl;
-	cout << SCAN(randValue, pos).first << endl;
-	cout << CSCAN(randValue, pos) << endl;
-	cout << FSCAN(randValue, pos) << endl;
+	cout << "FCFS的平均寻道数为:" << FCFS(randValue, pos) / 100 << endl;
+	cout << endl;
 
+	cout << "SSTF的平均寻道数为:" << SSTF(randValue, pos) / 100 << endl;
+	cout << endl;
 
+	cout << "SCAN的平均寻道数为:" << SCAN(randValue, pos).first / 100 << endl;
+	cout << endl;
 
+	cout << "CSCAN的平均寻道数为:" << CSCAN(randValue, pos) / 100 << endl;
+	cout << endl;
+
+	cout << "FSCAN的平均寻道数为:" << FSCAN(randValue, pos) / 100 << endl;
+	cout << endl;
 	return 0;
 }
