@@ -27,10 +27,10 @@ vector<char> Vn = { 'S','E','T','F' };
 //读取词法分析程序的输出结果，获得要进行语法分析的输入串
 string readFile();
 //判断是否是终结符号
-bool isVt(char& ch);
+bool isVt(char ch);
 
 //判断是否是非终结符号
-bool isVn(char& ch);
+bool isVn(char ch);
 
 //算符优先文法分析
 bool OperatorPrecedenceAnalysis(string& str);
@@ -49,6 +49,42 @@ int main()
 	}
 	return 0;
 }
+char reduce(string& temp)
+{
+	
+	for (auto i = grammer.begin(); i != grammer.end(); i++)
+	{
+		int count = 0;
+		if (i->first.size() == temp.size())
+		{
+			for (int j = 0; j < temp.size(); j++)
+			{
+				if (isVn(temp[j]) && isVn(i->first[j]))
+				{
+					count++;
+				}
+				else if (isVt(temp[j]) && isVt(i->first[j]) && (temp[j] == i->first[j]))
+				{
+					count++;
+				}
+			}
+			if (count == temp.size())
+			{
+				return i->second;
+			}
+		}
+	}
+	return 0;
+}
+
+void displayAnalysisProcess(const vector<char>& stack, const string& input, int inputPointer) {
+	cout << "栈内容: ";
+	for (char c : stack) {
+		cout << c << " ";
+	}
+	cout << "\t输入: " << input.substr(inputPointer) << endl;
+}
+
 bool OperatorPrecedenceAnalysis(string& str)
 {
 	//分析栈
@@ -62,7 +98,7 @@ bool OperatorPrecedenceAnalysis(string& str)
 	while (true)
 	{
 		r = str[k++];
-
+		displayAnalysisProcess(s, str, k - 1);
 		if (isVt(s[i]))
 		{
 			j = i;
@@ -80,29 +116,29 @@ bool OperatorPrecedenceAnalysis(string& str)
 			while (flag)
 			{
 				q = s[j];
-				//temp += q;
 				j = j - 1;
 				if (!isVt(s[j]))j = j - 1;
 				if (priorityMatrix[s[j]][q] == '<')
 				{
 					
 					//进行规约
-					//reverse(temp.begin(), temp.end());
 					for (int pos = j + 1; pos <= i; pos++)temp += s[pos];
 					for (int cn = 0; cn < temp.size(); cn++)
 					{
 						s.pop_back();
 					}
-					auto ptr = grammer.find(temp);
-					if (ptr == grammer.end())
+					//auto ptr = grammer.find(temp);
+					char ptr = reduce(temp);
+					if (ptr == 0)
 					{
 						cout << "没有找到规约的对应文法" << endl;
 						return false;
 					}
 					else
 					{
+						
 						i = j + 1;
-						s.push_back(ptr->second);
+						s.push_back(ptr);
 					}
 					flag = 0;
 					break;
@@ -119,6 +155,8 @@ bool OperatorPrecedenceAnalysis(string& str)
 		}
 		if (i == 1 && r == '#')
 		{
+			displayAnalysisProcess(s, str, k - 1);
+
 			return true;
 		}
 		else
@@ -130,7 +168,7 @@ bool OperatorPrecedenceAnalysis(string& str)
 	
 }
 
-bool isVt(char& ch)
+bool isVt(char ch)
 {
 	if (find(Vt.begin(), Vt.end(), ch) != Vt.end())
 	{
@@ -138,7 +176,7 @@ bool isVt(char& ch)
 	}
 	return false;
 }
-bool isVn(char& ch)
+bool isVn(char ch)
 {
 	if (find(Vn.begin(), Vn.end(), ch) != Vn.end())
 	{
