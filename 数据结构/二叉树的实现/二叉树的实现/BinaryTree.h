@@ -1,5 +1,8 @@
 #pragma once
-typedef int BTDataType;
+#include <queue>
+#include <iostream>
+using namespace std;
+typedef char BTDataType;
 typedef struct BinaryTreeNode
 {
 	BTDataType _val;
