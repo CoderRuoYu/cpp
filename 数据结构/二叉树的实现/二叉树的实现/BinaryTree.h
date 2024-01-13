@@ -1,6 +1,7 @@
 #pragma once
 #include <queue>
 #include <iostream>
+#include <assert.h>
 using namespace std;
 typedef char BTDataType;
 typedef struct BinaryTreeNode

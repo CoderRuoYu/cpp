@@ -41,6 +41,22 @@ int main()
 	cout << endl;
 
 	BinaryTreePostOrder(mainNode);
+	cout << endl;
+	cout << "树的节点个数为:" << BinaryTreeLeafSize(mainNode) << endl;
+	cout << "叶子节点个数为:" << BinaryTreeLeafSize(mainNode) << endl;
+	cout << "第k层节点数为" << BinaryTreeLevelKSize(mainNode, 3) << endl;
+	BinaryTreeLevelOrder(mainNode);
+	cout << endl;
+	BTNode* ptr = BinaryTreeFind(mainNode, '1');
+	cout << ptr->_val << endl;
+	char a[] = "123##4#5##67##8##";
+	int cn = 0;
+	ptr = BinaryTreeCreate(a, sizeof(a) / sizeof(a[0]), &cn);
+	BinaryTreeLevelOrder(ptr);
+
+
+
+	BinaryTreeDestory(&mainNode);
 
 	return 0;
 }
