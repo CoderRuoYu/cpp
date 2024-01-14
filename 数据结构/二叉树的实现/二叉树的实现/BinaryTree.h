@@ -32,4 +32,4 @@ void BinaryTreePostOrder(BTNode* root);
 // 层序遍历
 void BinaryTreeLevelOrder(BTNode* root);
 // 判断二叉树是否是完全二叉树
-int BinaryTreeComplete(BTNode* root);
+bool BinaryTreeComplete(BTNode* root);

@@ -49,11 +49,13 @@ int main()
 	cout << endl;
 	BTNode* ptr = BinaryTreeFind(mainNode, '1');
 	cout << ptr->_val << endl;
-	char a[] = "123##4#5##67##8##";
+	char a[] = "124##5##37##6##";
 	int cn = 0;
 	ptr = BinaryTreeCreate(a, sizeof(a) / sizeof(a[0]), &cn);
 	BinaryTreeLevelOrder(ptr);
+	cout << endl;
 
+	cout << BinaryTreeComplete(ptr) << endl;
 
 
 	BinaryTreeDestory(&mainNode);

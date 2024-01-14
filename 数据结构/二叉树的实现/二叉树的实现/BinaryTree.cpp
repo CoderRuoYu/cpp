@@ -122,7 +122,29 @@ void BinaryTreeLevelOrder(BTNode* root)
 	}
 }
 // 判断二叉树是否是完全二叉树
-int BinaryTreeComplete(BTNode* root)
+bool BinaryTreeComplete(BTNode* root)
 {
-	return 0;
+	queue<BTNode*> temp;
+	if(root)
+	{
+		temp.push(root);
+	}
+	while (!temp.empty())
+	{
+		BTNode* front = temp.front();
+		temp.pop();
+		if (front == nullptr)
+		{
+			break;
+		}
+		temp.push(front->_left);
+		temp.push(front->_right);
+	}
+	while (!temp.empty())
+	{
+		BTNode* front = temp.front();
+		if (front != nullptr)return false;
+		temp.pop();
+	}
+	return true;
 }
