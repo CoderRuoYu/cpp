@@ -35,8 +35,6 @@ void ListPushFront(ListNode* pHead, LTDataType x);
 // 双向链表删除pos位置的节点
 void ListErase(ListNode* pos);
 
-
-
 // 双向链表头删
 void ListPopFront(ListNode* pHead);
 

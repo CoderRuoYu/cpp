@@ -48,6 +48,7 @@ ListNode* ListFind(ListNode* pHead, LTDataType x)
 		{
 			return cur;
 		}
+		cur = cur->_next;
 	}
 	return NULL;
 
@@ -104,4 +105,18 @@ void ListPopBack(ListNode* pHead)
 {
 	assert(pHead);
 	ListErase(pHead->_prev);
+}
+
+// 双向链表销毁
+void ListDestory(ListNode* pHead)
+{
+	assert(pHead);
+	struct ListNode* cur = pHead->_next;
+	while (cur != pHead)
+	{
+		struct ListNode* ne = cur->_next;
+		free(cur);
+		cur = ne;
+	}
+	free(pHead);
 }
