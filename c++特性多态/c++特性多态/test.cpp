@@ -1,33 +1,39 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include <iostream>
 using namespace std;
-class Person
+class A
 {
 public:
-	virtual ~Person()
+	virtual void Func1()
 	{
-		cout << "父类对象释放" << endl;
+		cout << "A::Func1" << endl;
 	}
+	int _a;
 };
-class Student:public Person
+// class B : public A
+class B : virtual public A
 {
 public:
-	~Student()
-	{
-		cout << "子类对象释放" << endl;
-	}
-
+	int _b;
 };
-void test()
+// class C : public A
+class C : virtual public A
 {
-	Person* p1 = new Person();
-	Person* p2 = new Student();
-	delete p1;
-	delete p2;
-
-}
+public:
+	int _c;
+};
+class D : public B, public C
+{
+public:
+	int _d;
+};
 int main()
 {
-	test();
+	D d;
+	d.B::_a = 1;
+	d.C::_a = 2;
+	d._b = 3;
+	d._c = 4;
+	d._d = 5;
 	return 0;
 }
