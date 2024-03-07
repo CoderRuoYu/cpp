@@ -3,33 +3,23 @@
 
 void test01()
 {
-	/*BSTree<int, int> cnt;
-	cnt.Insert(1, 2);
-	cnt.Insert(8, 2);
-	cnt.Insert(5, 2);
-	cnt.Insert(4, 2);
-	cnt.Insert(-1, 2);
-	cnt.InOrder();*/
-
-	BSTree<string, string> dict;
-	dict.Insert("insert", "插入");
-	dict.Insert("erase", "删除");
-	dict.Insert("left", "左边");
-	dict.Insert("string", "字符串");
-
-	string str;
-	while (cin >> str)
+	BSTree<int, int> t;
+	int arr[] = { 8,5,6,7,9,2,3,1,0 };
+	for (auto e : arr)
 	{
-		auto ret = dict.Find(str);
-		if (ret)
-		{
-			cout << str << ":" << ret->_value << endl;
-		}
-		else
-		{
-			cout << "单词拼写错误" << endl;
-		}
+		t.Insert(e, e);
+		t.InOrder();
 	}
+	/*t.Erase(8);
+	t.InOrder();
+	t.Erase(5);
+	t.InOrder();*/
+	for (auto e : arr)
+	{
+		t.Erase(e);
+		t.InOrder();
+	}
+	t.InOrder();
 
 }
 int main()
