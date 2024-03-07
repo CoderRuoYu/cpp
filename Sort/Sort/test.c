@@ -1,37 +1,20 @@
 #define _CRT_SECURE_NO_WARNINGS 1
-#include <stdio.h>
-#include <stdlib.h>
-void ShellSort(int* a, int n)
+#include "Sort.h"
+
+void test01()
 {
-	int gap = 3;
-	for (int cn = 0; cn < gap; cn++)
-	{
-		for (int i = cn; i < n; i += gap)
-		{
+	int a[] = { 9,8,7,6,5,4,3,2,1,0 };
+	ArryPrint(a, sizeof(a) / sizeof(int));
 
-			int end;
-			int tmp = a[end + gap];
-			while (end >= 0)
-			{
-				if (a[end] > tmp)
-				{
-					a[end + gap] = a[end];
-					end -= gap;
-				}
-				else
-				{
-					break;
-				}
-			}
-			a[end + gap] = tmp;
-		}
-	}
-	
-	
+	InsertSort(a, sizeof(a) / sizeof(int));
+	ArryPrint(a, sizeof(a) / sizeof(int));
+
 }
-
 int main()
 {
-
+	test01();
 	return 0;
 }
+
+
+
