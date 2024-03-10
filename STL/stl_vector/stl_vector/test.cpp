@@ -2,7 +2,7 @@
 #include "vector.h"
 void test01()
 {
-	gao::vector<int> temp(1,2);
+	/*gao::vector<int> temp(1,2);
 
 	for (auto e:temp)
 	{
@@ -14,7 +14,10 @@ void test01()
 	{
 		std::cout << e << " ";
 	}
-	cout << endl;
+	cout << endl;*/
+	gao::vector<vector<int>> test(20,vector<int>(20));
+	test[19].push_back(1);
+	cout << test[1].back() << endl;
 }
 int main()
 {
