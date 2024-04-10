@@ -1,4 +1,6 @@
 #pragma once
+#include <assert.h>
+#include <iostream>
 template <class K,class V>
 struct AVLTreeNode
 {
@@ -99,7 +101,26 @@ public:
 			}
 			else if (parent->_bf == -2 || parent->_bf == 2)
 			{
-				RotateR(parent);
+				if (parent->_bf == 2 && parent->_right->_bf == -1)
+				{
+					RotateRL(parent);
+				}
+				else if (parent->_bf == 2 && parent->_right->_bf == 1)
+				{
+					RotateL(parent);
+				}
+				else if (parent->_bf == -2 && parent->_left->_bf == 1)
+				{
+					RotateLR(parent);
+				}
+				else if (parent->_bf == -2 && parent->_left->_bf == -1)
+				{
+					RotateR(parent);
+				}
+				else
+				{
+					assert(false);
+				}
 			}
 		}
 		return true;
@@ -166,19 +187,28 @@ public:
 	}
 	void RotateLR(Node* parent)
 	{
-		int bf = parent->_left->_right->_bf;
 		Node* pleft = parent->_left;
+		Node* pleftRight = pleft->_right;
+		int bf = pleftRight->_bf;
 		RotateL(parent->_left);
 		RotateR(parent);
 		if (bf == 1)
 		{
-			parent->_bf = 0;
 			pleft->_bf = -1;
+			parent->_bf = 0;
+			pleftRight->_bf = 0;
 		}
 		else if (bf == -1)
 		{
-			parent->_bf = 1;
 			pleft->_bf = 0;
+			parent->_bf = 1;
+			pleftRight->_bf = 0;
+		}
+		else if (bf == 0)
+		{
+			pleft->_bf = 0;
+			parent->_bf = 0;
+			pleftRight->_bf = 0;
 		}
 		else
 		{
@@ -188,21 +218,29 @@ public:
 	void RotateRL(Node* parent)
 	{
 		
-		int bf = ->_bf;
 		Node* pright = parent->_right;
-
+		Node* prightLeft = pright->_left;
+		int bf = prightLeft->_bf;
 		RotateR(parent->_right);
 		RotateL(parent);
-
 		if (bf == 1)
 		{
-			parent->_bf = 0;
-			pleft->_bf = -1;
+			parent->_bf = -1;
+			pright->_bf = 0;
+			prightLeft->_bf = 0;
+			
 		}
 		else if (bf == -1)
 		{
-			parent->_bf = 1;
-			pleft->_bf = 0;
+			parent->_bf = 0;
+			pright->_bf = 1;
+			prightLeft->_bf = 0;
+		}
+		else if (bf == 0)
+		{
+			parent->_bf = 0;
+			pright->_bf = 0;
+			prightLeft->_bf = 0;
 		}
 		else
 		{
@@ -216,7 +254,28 @@ public:
 		_print(_root);
 		cout << endl;
 	}
+	bool IsAVLTree()
+	{
+		return _IsAVLTree(_root);
+	}
 private:
+	bool _IsAVLTree(Node* root)
+	{
+		if (root == nullptr)return true;
+		if (!_IsAVLTree(root->_left) || !_IsAVLTree(root->_right))return false;
+		int left = _Height(root->_left);
+		int right = _Height(root->_right);
+		int balance_factor = right - left;
+		if (abs(balance_factor) >= 2 || balance_factor != root->_bf)return false;
+		return true;
+	}
+	size_t _Height(Node* root)
+	{
+		if (root == nullptr)return 0;
+		int left = _Height(root->_left);
+		int right = _Height(root->_right);
+		return left >= right ? left + 1 : right + 1;
+	}
 	void _print(Node* root)
 	{
 		if (root == nullptr)return;

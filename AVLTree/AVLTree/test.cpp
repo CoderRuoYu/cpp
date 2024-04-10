@@ -1,15 +1,17 @@
 #define _CRT_SECURE_NO_WARNINGS 1
-#include <iostream>
 using namespace std;
 #include "AVLTree.h"
 void test01()
 {
 	AVLTree<int, int> t;
-	t.insert(make_pair(30, 30));
-	t.printTree();
+	int arr[] = { 8,4,5,6,2,4,5,9,10,22,-1 };
+	for (auto e : arr)
+	{
+		t.insert(make_pair(e, e));
+		cout << t.IsAVLTree() << endl;
+	}
+	t.IsAVLTree();
 
-	t.insert(make_pair(10, 40));
-	t.insert(make_pair(0, 50));
 	t.printTree();
 }
 int main()
