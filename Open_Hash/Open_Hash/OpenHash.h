@@ -64,6 +64,9 @@ namespace OpenHash
 			{
 				HashBucket<K, V> newBucket(_table.size() * 2);
 				//插入指针
+				// !!!!!!!!!!
+				//这种方法会新开所有节点，并释放所有节点，造成浪费，可以复制循环外面的代码实现
+				//！！！！！！！
 				for (auto& cur : _table)
 				{
 					while (cur)
