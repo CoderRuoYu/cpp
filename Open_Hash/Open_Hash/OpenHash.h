@@ -49,17 +49,17 @@ namespace OpenHash
 			, _size(0)
 		{}
 
-		/*~HashBucket()
+		~HashBucket()
 		{
 			Clear();
-		}*/
+		}
 
 		// 哈希桶中的元素不能重复
 		bool Insert(const pair<K, V>& data)
 		{
+			if (Find(data.first))return false;
 			HF hashFunc;
 			size_t pos = hashFunc(data.first) % _table.size();
-			if (Find(data.first))return false;
 			if ((float)_size / (float)_table.size() >= 0.7)
 			{
 				HashBucket<K, V> newBucket(_table.size() * 2);
@@ -82,7 +82,24 @@ namespace OpenHash
 		}
 
 		// 删除哈希桶中为data的元素
-		bool Erase(const K& key);
+		bool Erase(const K& key)
+		{
+			HF hashFunc;
+			size_t pos =hashFunc(key) % _table.size();
+			Node* cur = _table[pos];
+			Node* parent = nullptr;
+			while (cur && cur->_data.first != key)
+			{
+				parent = cur;
+				cur = cur->_pNext;
+			}
+			if (cur == nullptr)return false;
+			if (parent == nullptr)_table[pos] = nullptr;
+			else parent->_pNext = nullptr;
+			delete cur;
+			_size--;
+			return true;
+		}
 
 		Node* Find(const K& key)
 		{
@@ -101,7 +118,7 @@ namespace OpenHash
 		}
 
 
-		void clear();
+		
 
 		size_t Size()const
 		{
@@ -113,6 +130,21 @@ namespace OpenHash
 			return 0 == _size;
 		}
 	private:
+		void Clear()
+		{
+			_size = 0;
+			for (auto cur : _table)
+			{
+				Node* setNull = cur;
+				while (cur)
+				{
+					Node* tmp = cur;
+					cur = cur->_pNext;
+					delete tmp;
+				}
+				setNull = nullptr;
+			}
+		}
 		vector<Node*> _table;
 		size_t _size;      
 	};

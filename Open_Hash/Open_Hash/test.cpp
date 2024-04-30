@@ -12,6 +12,8 @@ void test01()
 	{
 		tem.Insert(make_pair(e, e));
 	}
+	tem.Erase(2);
+	cout << tem.Size() << endl;
 }
 int main()
 {
