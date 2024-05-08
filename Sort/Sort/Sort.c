@@ -34,22 +34,10 @@ void InsertSort(int* a, int n)
 void ShellSort(int* a, int n)
 {
 	int grep = n;
-
-	for(int i=grep)
-	int end;
-	int tmp;
-	while (end >= 0)
+	for (int i = grep; i >= 0; i--)
 	{
-		if (a[end] > tmp)
-		{
-			a[end + 1] = a[end];
-			end--;
-		}
-		else
-		{
-			break;
-		}
+
 	}
-	a[end + 1] = tmp;
+	
 
 }
