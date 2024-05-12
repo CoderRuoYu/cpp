@@ -6,6 +6,6 @@ using namespace std;
 
 int main()
 {
-	linkTable::test01();
+	linkMatrix::test01();
 	return 0;
 }

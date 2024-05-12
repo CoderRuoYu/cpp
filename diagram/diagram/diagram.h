@@ -3,8 +3,21 @@
 #include <map>
 #include <string>
 #include <climits>
+#include <queue>
 namespace linkMatrix
 {
+	template <class W>
+	struct Edge
+	{
+		Edge(size_t src,size_t dest,W weight)
+			:_srci(src),
+			_desti(dest),
+			_weight(weight)
+		{}
+		size_t _srci;
+		size_t _desti;
+		W _weight;
+	};
 	template <class V, class W, W MAX_W = INT_MAX, bool isDirectedGraph = false>
 	class graph
 	{
@@ -20,8 +33,8 @@ namespace linkMatrix
 				_vIndex[arr[i]] = i;
 				_matrix[i].resize(n, MAX_W);
 			}
-
 		}
+
 		void addEdge(const V& src, const V& dest, W weight)
 		{
 			size_t srci = GetIndex(src);
@@ -32,6 +45,7 @@ namespace linkMatrix
 				_matrix[desti][srci] = weight;
 			}
 		}
+
 		size_t GetIndex(const V& vertex)
 		{
 			//typename的使用！！！！ 在使用嵌套类型时，区分是类中的静态成员还是类中的一个类型
@@ -43,6 +57,7 @@ namespace linkMatrix
 			}
 			return _vIndex[*t];
 		}
+
 		void print()
 		{
 			for (size_t i = 0; i < _vertexs.size(); i++)
@@ -67,6 +82,76 @@ namespace linkMatrix
 				cout << endl;
 			}
 			cout << endl;
+		}
+		void BFS(const V& src)
+		{
+			vector<size_t> visited(_vertexs.size(), 0);
+			queue<size_t> q;
+			size_t srci = _vIndex.at(src);
+			q.push(srci);
+			visited[srci] = 1;
+			size_t cn = 0;
+			while (!q.empty())
+			{
+				srci = q.front();
+				q.pop();
+				cout << srci << ':' << _vertexs[srci] << endl;
+				cn++;
+				for (size_t i = 0; i < _vertexs.size(); i++)
+				{
+					if (_matrix[srci][i] != MAX_W && visited[i] != 1)
+					{
+						q.push(i);
+						visited[i] = 1;
+					}
+				}
+				if (q.empty() && cn != _vertexs.size())
+				{
+					for (size_t i = 0; i < _vertexs.size(); i++)
+					{
+						if (visited[i] == 0)
+						{
+							q.push(i);
+							visited[i] = 1;
+
+							break;
+						}
+					}
+				}
+			}
+		}
+		void _DFS(size_t srci, vector<bool>& visited,size_t& cn)
+		{
+			visited[srci] = true;
+			cn++;
+			cout << srci << ':' << _vertexs[srci] << endl;
+			for (size_t i = 0; i < _vertexs.size(); i++)
+			{
+				if (_matrix[srci][i] != MAX_W && visited[i] != true)
+				{
+					_DFS(i, visited,cn);
+				}
+			}
+		}
+		void DFS(const V& src)
+		{
+			vector<bool> visited(_vertexs.size(), false);
+			size_t srci = _vIndex.at(src);
+			size_t cn = 0;
+			_DFS(srci, visited,cn);
+			while (cn != visited.size())
+			{
+				for (size_t i = 0; i < visited.size(); i++)
+				{
+					if (visited[i] == false)
+					{
+						_DFS(i, visited, cn);
+					}
+				}
+			}
+		}
+		W kruskal()
+		{
 
 		}
 	private:
@@ -76,14 +161,16 @@ namespace linkMatrix
 	};
 	void test01()
 	{
-		string arr[] = { "张三","李四","王五","麻子" };
-		graph<string, int , true> a(arr, sizeof(arr) / sizeof(arr[0]));
-		a.addEdge("张三", "李四", 1);
-		a.addEdge("张三", "王五", 2);
+		string arr[] = { "张三","李四","王五","麻子" ,"刘思" };
+		graph<string, int ,INT_MAX,true> a(arr, sizeof(arr) / sizeof(arr[0]));
+		a.addEdge("张三", "李四", 3);
+		a.addEdge("张三", "王五", 3);
 		a.addEdge("张三", "麻子", 3);
+		a.addEdge("麻子", "张三", 3);
 		a.addEdge("王五", "麻子", 3);
-		a.addEdge("麻子", "王五", 6);
 		a.print();
+		a.DFS("刘思");
+		
 	}
 }
 namespace linkTable
