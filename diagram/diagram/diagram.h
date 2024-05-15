@@ -4,8 +4,51 @@
 #include <string>
 #include <climits>
 #include <queue>
+#include <set>
+#include <string>
 namespace linkMatrix
 {
+	class UnionFindSet
+	{
+	public:
+		UnionFindSet(size_t N)
+		{
+			_ufs.resize(N, -1);
+		}
+		int FindInSet(int x)
+		{
+			while (_ufs[x] >= 0)
+			{
+				x = _ufs[x];
+			}
+			return x;
+		}
+		bool InSameSet(int a, int b)
+		{
+			return FindInSet(a) == FindInSet(b);
+		}
+		bool Union(int a, int b)
+		{
+			int index1 = FindInSet(a);
+			int index2 = FindInSet(b);
+			if (index1 == index2)return false;
+			_ufs[index1] += _ufs[index2];
+			_ufs[index2] = index1;
+			return true;
+		}
+		size_t Count()
+		{
+			int size = 0;
+			for (auto e : _ufs)
+			{
+				if (e < 0)size++;
+			}
+			return size;
+		}
+	private:
+		vector<int> _ufs;
+	};
+
 	template <class W>
 	struct Edge
 	{
@@ -14,6 +57,10 @@ namespace linkMatrix
 			_desti(dest),
 			_weight(weight)
 		{}
+		bool operator>(const Edge<W>& compare)const
+		{
+			return _weight > compare._weight;
+		}
 		size_t _srci;
 		size_t _desti;
 		W _weight;
@@ -23,7 +70,7 @@ namespace linkMatrix
 	{
 	public:
 		//给一个数组，并告诉我需要存储多少个顶点
-		graph(V* arr, size_t n)
+		graph(const V* arr, size_t n)
 			:_vertexs(n),
 			_matrix(n)
 		{
@@ -34,7 +81,8 @@ namespace linkMatrix
 				_matrix[i].resize(n, MAX_W);
 			}
 		}
-
+		graph()
+		{}
 		void addEdge(const V& src, const V& dest, W weight)
 		{
 			size_t srci = GetIndex(src);
@@ -150,8 +198,167 @@ namespace linkMatrix
 				}
 			}
 		}
-		W kruskal()
+		W kruskal(graph<V, W, MAX_W, isDirectedGraph>& res)
 		{
+			size_t n = _vertexs.size();
+			res._vertexs = _vertexs;
+			res._vIndex = _vIndex;
+			res._matrix.resize(n);
+			for (int i = 0; i < n; i++)
+			{
+				res._matrix[i].resize(n, MAX_W);
+			}
+			priority_queue<Edge<W>, vector<Edge<W>>, greater<Edge<W>>> q;
+			UnionFindSet u(n);
+			//选取最短路径
+			for (size_t i = 0; i < n; i++)
+			{
+				for (size_t j = 0; j < n; j++)
+				{
+					if (_matrix[i][j] != MAX_W)
+					{
+						q.push(Edge<W>(i, j, _matrix[i][j]));
+					}
+				}
+			}
+			//对节点处理
+			W weight = W();
+			size_t cn = n - 1;
+			Edge<W> minW = q.top();
+			q.pop();
+			weight += minW._weight;
+			cn--;
+			res.addEdge(res._vertexs[minW._srci], res._vertexs[minW._desti], minW._weight);
+			u.Union(minW._srci, minW._desti);
+
+			while (!q.empty() && cn)
+			{
+				minW = q.top();
+				q.pop();
+				if (!u.InSameSet(minW._srci, minW._desti))
+				{
+					cn--;
+					weight += minW._weight;
+					res.addEdge(res._vertexs[minW._srci], res._vertexs[minW._desti], minW._weight);
+					u.Union(minW._srci, minW._desti);
+				}
+			}
+			if (cn == 0)return weight;
+			else return W();
+		}
+		W Prim(const V& src, graph<V, W, MAX_W, isDirectedGraph>& res)
+		{
+			size_t srci = _vIndex[src];
+			size_t n = _vertexs.size();
+			//设置两个set，一个set用于作为已经选取源节点的顶点，另一个set用于作为还未在连通图中的节点
+			set<size_t> X;
+			set<size_t> Y;
+			X.insert(srci);
+			for (size_t i = 0; i < n; i++)
+			{
+				if (i != srci)
+				{
+					Y.insert(i);
+				}
+			}
+			res._vertexs = _vertexs;
+			res._vIndex = _vIndex;
+			res._matrix.resize(n);
+			for (int i = 0; i < n; i++)
+			{
+				res._matrix[i].resize(n, MAX_W);
+			}
+			priority_queue<Edge<W>, vector<Edge<W>>, greater<Edge<W>>> q;
+			for (int i = 0; i < n; i++)
+			{
+				if (_matrix[srci][i] != MAX_W)
+				q.push(Edge<W>(srci, i, _matrix[srci][i]));
+			}
+			W weight = W();
+			size_t cn = n - 1;
+			Edge<W> minE = q.top();
+			q.pop();
+			res.addEdge(res._vertexs[minE._srci], res._vertexs[minE._desti], minE._weight);
+			cn--;
+			weight += minE._weight;
+			X.insert(minE._desti);
+			Y.erase(minE._desti);
+			for (int i = 0; i < n; i++)
+			{
+				if (_matrix[minE._desti][i] != MAX_W && X.count(i) == 0)
+				{
+					q.push(Edge<W>(minE._desti, i, _matrix[minE._desti][i]));
+				}
+				
+			}
+			
+			while (!q.empty() && cn)
+			{
+				Edge<W> minE = q.top();
+				q.pop();
+				if (X.count(minE._srci) == 1 && Y.count(minE._desti) == 1)
+				{
+					
+					res.addEdge(res._vertexs[minE._srci], res._vertexs[minE._desti], minE._weight);
+
+					cn--;
+					weight += minE._weight;
+					X.insert(minE._desti);
+					Y.erase(minE._desti);
+					for (int i = 0; i < n; i++)
+					{
+						if (_matrix[minE._desti][i] != MAX_W && X.count(i) == 0)
+						{
+							q.push(Edge<W>(minE._desti, i, _matrix[minE._desti][i]));
+						}
+							
+					}
+				}
+			}
+			if (cn == 0)return weight;
+			else return W();
+		}
+		//一般用于有向图
+		//传入一个顶点，求这个顶点到其它顶点的最短路径
+		void Dijkstra(const V& src, vector<W> weight, vector<int> shortest_path)
+		{
+			size_t n = _vertexs.size();
+			size_t srci = _vIndex[src];
+			weight.resize(n, MAX_W);
+			shortest_path.resize(n, -1);
+			//声明一个数组，用于确认这个点的最短路径是否已经确认
+			vector<bool> vConfirm(n, false);
+			weight[srci] = 0;
+			size_t cn = n;
+			vConfirm[srci] = true;
+			n--;
+			for (size_t i = 0; i < n; i++)
+			{
+				if (_matrix[srci][i] != MAX_W && vConfirm[i] == false && weight[srci] + _matrix[srci][i] < weight[i])
+				{
+					weight[i] = weight[srci] + _matrix[srci][i];
+				}
+			}
+			while (n)
+			{
+				size_t minw = MAX_W;
+				int mincur = -1;
+				for (size_t i = 0; i < n; i++)
+				{
+					if (vConfirm[i] == false && weight[i] < minw)
+					{
+						mincur = i;
+						minw = weight[i];
+					}
+				}
+				vConfirm[i] = true;
+				
+
+			}
+		
+
+
+
 
 		}
 	private:
@@ -171,6 +378,32 @@ namespace linkMatrix
 		a.print();
 		a.DFS("刘思");
 		
+	}
+	void TestGraphMinTree()
+	{
+		const char* str = "abcdefghi";
+		graph<char, int> g(str, strlen(str));
+		g.addEdge('a', 'b', 4);
+		g.addEdge('a', 'h', 8);
+		//g.AddEdge('a', 'h', 9);
+		g.addEdge('b', 'c', 8);
+		g.addEdge('b', 'h', 11);
+		g.addEdge('c', 'i', 2);
+		g.addEdge('c', 'f', 4);
+		g.addEdge('c', 'd', 7);
+		g.addEdge('d', 'f', 14);
+		g.addEdge('d', 'e', 9);
+		g.addEdge('e', 'f', 10);
+		g.addEdge('f', 'g', 2);
+		g.addEdge('g', 'h', 1);
+		g.addEdge('g', 'i', 6);
+		g.addEdge('h', 'i', 7);
+		graph<char, int> kminTree;
+		cout << "Kruskal:" << g.kruskal(kminTree) << endl;
+		kminTree.print();
+		graph<char, int> pminTree;
+		cout << "Prim:" << g.Prim('a', pminTree) << endl;
+		pminTree.print();
 	}
 }
 namespace linkTable
