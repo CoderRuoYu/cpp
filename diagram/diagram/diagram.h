@@ -5,6 +5,7 @@
 #include <climits>
 #include <queue>
 #include <set>
+#include <assert.h>
 #include <string>
 namespace linkMatrix
 {
@@ -320,52 +321,267 @@ namespace linkMatrix
 		}
 		//一般用于有向图
 		//传入一个顶点，求这个顶点到其它顶点的最短路径
-		void Dijkstra(const V& src, vector<W> weight, vector<int> shortest_path)
+		void Dijkstra(const V& src, vector<W>& weight, vector<int>& shortest_path)
 		{
-			size_t n = _vertexs.size();
+			const size_t n = _vertexs.size();
 			size_t srci = _vIndex[src];
 			weight.resize(n, MAX_W);
 			shortest_path.resize(n, -1);
+			size_t cn = n;
 			//声明一个数组，用于确认这个点的最短路径是否已经确认
 			vector<bool> vConfirm(n, false);
-			weight[srci] = 0;
-			size_t cn = n;
-			vConfirm[srci] = true;
-			n--;
-			for (size_t i = 0; i < n; i++)
+
+			//源节点到自己的最短路径已经找到
+			weight[srci] = W();
+			shortest_path[srci] = -1;
+			while (cn != 0)
 			{
-				if (_matrix[srci][i] != MAX_W && vConfirm[i] == false && weight[srci] + _matrix[srci][i] < weight[i])
-				{
-					weight[i] = weight[srci] + _matrix[srci][i];
-				}
-			}
-			while (n)
-			{
-				size_t minw = MAX_W;
-				int mincur = -1;
+				int curi = -1;
+				int min = MAX_W;
 				for (size_t i = 0; i < n; i++)
 				{
-					if (vConfirm[i] == false && weight[i] < minw)
+					if (weight[i] != MAX_W && vConfirm[i] == false && weight[i] < min)
 					{
-						mincur = i;
-						minw = weight[i];
+						curi = i;
+						min = weight[i];
 					}
 				}
-				vConfirm[i] = true;
-				
-
+				if (curi == -1)
+				{
+					cout << "该图是非连通图" << endl;
+					assert(false);
+					return;
+				}
+				else
+				{
+					vConfirm[curi] = true;
+					cn--;
+				}
+				for (size_t i = 0; i < n; i++)
+				{
+					if (vConfirm[i] == false && _matrix[curi][i] != MAX_W && weight[curi] + _matrix[curi][i] < weight[i])
+					{
+						weight[i] = weight[curi] + _matrix[curi][i];
+						shortest_path[i] = curi;
+					}
+				}
 			}
-		
+		}
+		// 打印最短路径的逻辑算法
+		void PrinrtShotPath(const V& src, const vector<W>& dist, const vector<int>&
+			parentPath)
+		{
+			size_t N = _vertexs.size();
+			size_t srci = _vIndex[src];
+			for (size_t i = 0; i < N; ++i)
+			{
+				if (i == srci)
+					continue;
 
+				vector<int> path;
+				int parenti = i;
+				while (parenti != srci)
+				{
+					path.push_back(parenti);
+					parenti = parentPath[parenti];
+				}
+				path.push_back(srci);
+				reverse(path.begin(), path.end());
+				for (auto pos : path)
+				{
+					cout << _vertexs[pos] << "->";
+				}
+				cout << ":" << dist[i] << endl;
+			}
+		}
+		//求最短路径并可以解决负权路径问题
+		bool Bellman_Ford(const V& src, vector<W>& dist, vector<int>& shortest_path)
+		{
+			int srci = _vIndex[src];
+			const size_t n = _vertexs.size();
+			dist.resize(n, MAX_W);
+			shortest_path.resize(n, -1);
+			dist[srci] = W();
+			shortest_path[srci] = -1;
+			for (int cn = 0; cn < n - 1; cn++)
+			{
+				bool flag = false;
+				for (int i = 0; i < n; i++)
+				{
+					for (int j = 0; j < n; j++)
+					{
+						if (_matrix[i][j] != MAX_W && dist[i] != MAX_W && _matrix[i][j] + dist[i] < dist[j])
+						{
+							flag = true;
+							dist[j] = _matrix[i][j] + dist[i];
+							shortest_path[j] = i;
+						}
+					}
+				}
+				if (!flag)break;
+			}
 
-
-
+			for (int i = 0; i < n; i++)
+			{
+				for (int j = 0; j < n; j++)
+				{
+					if (_matrix[i][j] != MAX_W && dist[i] != MAX_W && _matrix[i][j] + dist[i] < dist[j])
+					{
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+		void FloydWarShall(vector<vector<W>>& vvDist, vector<vector<int>>& vvpPath)
+		{
+			const size_t n = _vertexs.size();
+			vvDist.resize(n);
+			vvpPath.resize(n);
+			for (int i = 0; i < n; i++)
+			{
+				vvDist[i].resize(n, MAX_W);
+				vvpPath[i].resize(n, -1);
+			}
+			for (int i = 0; i < n; i++)
+			{
+				for (int j = 0; j < n; j++)
+				{
+					if (_matrix[i][j] != MAX_W)
+					{
+						vvDist[i][j] = _matrix[i][j];
+						vvpPath[i][j] = i;
+					}
+					if (i == j)
+					{
+						vvDist[i][j] = 0;
+					}
+				}
+			}
+			for (int k = 0; k < n; k++)
+			{
+				for (int i = 0; i < n; i++)
+				{
+					for (int j = 0; j < n; j++)
+					{
+						if (vvDist[k][j] != MAX_W && vvDist[i][k] != MAX_W && vvDist[i][k] + vvDist[k][j] < vvDist[i][j])
+						{
+							vvDist[i][j] = vvDist[i][k] + vvDist[k][j];
+							vvpPath[i][j] = vvpPath[k][j];
+						}
+					}
+				}
+			}
 		}
 	private:
 		vector<V> _vertexs;
 		map<V, size_t> _vIndex;
 		vector<vector<W>> _matrix;
 	};
+	void TestFloydWarShall()
+	{
+		const char* str = "12345";
+		graph<char, int, INT_MAX, true> g(str, strlen(str));
+		g.addEdge('1', '2', 3);
+		g.addEdge('1', '3', 8);
+		g.addEdge('1', '5', -4);
+		g.addEdge('2', '4', 1);
+		g.addEdge('2', '5', 7);
+		g.addEdge('3', '2', 4);
+		g.addEdge('4', '1', 2);
+		g.addEdge('4', '3', -5);
+		g.addEdge('5', '4', 6);
+		vector<vector<int>> vvDist;
+		vector<vector<int>> vvParentPath;
+		g.FloydWarShall(vvDist, vvParentPath);
+		// 打印任意两点之间的最短路径
+		for (size_t i = 0; i < strlen(str); ++i)
+		{
+			g.PrinrtShotPath(str[i], vvDist[i], vvParentPath[i]);
+			cout << endl;
+		}
+	}
+	void TestGraphBellmanFord()
+	{
+		/*const char* str = "syztx";
+		graph<char, int, INT_MAX, true> g(str, strlen(str));
+		g.addEdge('s', 't', 6);
+		g.addEdge('s', 'y', 7);
+		g.addEdge('y', 'z', 9);
+		g.addEdge('y', 'x', -3);
+		g.addEdge('z', 's', 2);
+		g.addEdge('z', 'x', 7);
+		g.addEdge('t', 'x', 5);
+		g.addEdge('t', 'y', 8);
+		g.addEdge('t', 'z', -4);
+		g.addEdge('x', 't', -2);
+		vector<int> dist;
+		vector<int> parentPath;
+		if (g.Bellman_Ford('s', dist, parentPath))
+		{
+			g.PrinrtShotPath('s', dist, parentPath);
+		}
+		else
+		{
+			cout << "存在负权回路" << endl;
+		}*/
+		//微调图结构，带有负权回路的测试
+		const char* str = "syztx";
+		graph<char, int, INT_MAX, true> g(str, strlen(str));
+		g.addEdge('s', 't', 6);
+		g.addEdge('s', 'y', 7);
+		g.addEdge('y', 'x', -3);
+		g.addEdge('y', 'z', 9);
+		g.addEdge('y', 'x', -3);
+		g.addEdge('y', 's', 1); // 新增
+		g.addEdge('z', 's', 2);
+		g.addEdge('z', 'x', 7);
+		g.addEdge('t', 'x', 5);
+		g.addEdge('t', 'y', -8); // 更改
+		g.addEdge('t', 'z', -4);
+		g.addEdge('x', 't', -2);
+		vector<int> dist;
+		vector<int> parentPath;
+		if (g.Bellman_Ford('s', dist, parentPath))
+		{
+		 g.PrinrtShotPath('s', dist, parentPath);
+		}
+		else
+		{
+		 cout << "存在负权回路" << endl;
+		}
+	}
+	void TestGraphDijkstra()
+	{
+		const char* str = "syztx";
+		graph<char, int, INT_MAX, true> g(str, strlen(str));
+		g.addEdge('s', 't', 10);
+		g.addEdge('s', 'y', 5);
+		g.addEdge('y', 't', 3);
+		g.addEdge('y', 'x', 9);
+		g.addEdge('y', 'z', 2);
+		g.addEdge('z', 's', 7);
+		g.addEdge('z', 'x', 6);
+		g.addEdge('t', 'y', 2);
+		g.addEdge('t', 'x', 1);
+		g.addEdge('x', 'z', 4);
+		vector<int> dist;
+		vector<int> parentPath;
+		g.Dijkstra('s', dist, parentPath);
+		g.PrinrtShotPath('s', dist, parentPath);
+		// 图中带有负权路径时，贪心策略则失效了。
+		// 测试结果可以看到s->t->y之间的最短路径没更新出来
+		/*const char* str = "sytx";
+		 Graph<char, int, INT_MAX, true> g(str, strlen(str));
+		 g.AddEdge('s', 't', 10);
+		 g.AddEdge('s', 'y', 5);
+		 g.AddEdge('t', 'y', -7);
+		 g.AddEdge('y', 'x', 3);
+		 vector<int> dist;
+		 vector<int> parentPath;
+		 g.Dijkstra('s', dist, parentPath);
+		 g.PrinrtShotPath('s', dist, parentPath);*/
+	}
 	void test01()
 	{
 		string arr[] = { "张三","李四","王五","麻子" ,"刘思" };
