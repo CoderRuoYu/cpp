@@ -6,6 +6,6 @@ using namespace std;
 
 int main()
 {
-	linkMatrix::TestFloydWarShall();
+	linkMatrix::TestGraphDijkstra();
 	return 0;
 }

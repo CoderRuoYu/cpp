@@ -553,18 +553,18 @@ namespace linkMatrix
 	}
 	void TestGraphDijkstra()
 	{
-		const char* str = "syztx";
-		graph<char, int, INT_MAX, true> g(str, strlen(str));
-		g.addEdge('s', 't', 10);
-		g.addEdge('s', 'y', 5);
-		g.addEdge('y', 't', 3);
-		g.addEdge('y', 'x', 9);
-		g.addEdge('y', 'z', 2);
-		g.addEdge('z', 's', 7);
-		g.addEdge('z', 'x', 6);
-		g.addEdge('t', 'y', 2);
-		g.addEdge('t', 'x', 1);
-		g.addEdge('x', 'z', 4);
+		const char* str = "uvxwzy";
+		graph<char, int, INT_MAX, false> g(str, strlen(str));
+		g.addEdge('u', 'v', 2);
+		g.addEdge('u', 'x', 2);
+		g.addEdge('u', 'w', 3);
+		g.addEdge('v', 'w', 2);
+		g.addEdge('v', 'x', 1);
+		g.addEdge('x', 'w', 3);
+		g.addEdge('x', 'y', 1);
+		g.addEdge('w', 'y', 2);
+		g.addEdge('w', 'z', 7);
+		g.addEdge('y', 'z', 10);
 		vector<int> dist;
 		vector<int> parentPath;
 		g.Dijkstra('s', dist, parentPath);
