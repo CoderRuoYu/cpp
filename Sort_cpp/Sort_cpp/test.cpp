@@ -99,11 +99,12 @@ void BubbleSort(int* arr, int n)
 		}
 	}
 }
-void QuickSort(int* arr, int left, int right)
+void QuickSort1(int* arr, int left, int right)
 {
 	if (left >= right)return;
 	int flagi = left;
-	int righti = right;
+	int begin = left;
+	int end = right;
 	while (left < right)
 	{
 		while (left < right && arr[right] >= arr[flagi])right--;
@@ -112,18 +113,95 @@ void QuickSort(int* arr, int left, int right)
 	}
 	swap(arr[left], arr[flagi]);
 	flagi = left;
-	QuickSort(arr, 0, flagi - 1);
-	QuickSort(arr, flagi + 1, righti);
+	QuickSort1(arr, begin, flagi - 1);
+	QuickSort1(arr, flagi + 1, end);
+}
+//优化快速排序——三数取中
+int GetMidNum(int* arr, int left, int right)
+{
+	int mid = (left + right) / 2;
+	if (arr[left] < arr[mid])
+	{
+		if (arr[mid] < arr[right])
+		{
+			return mid;
+		}
+		else if (arr[left] > arr[right])
+		{
+			return left;
+		}
+		else
+		{
+			return right;
+		}
+	}
+	else
+	{
+		if (arr[mid] > arr[right])
+		{
+			return mid;
+		}
+		else if (arr[right] > arr[left])
+		{
+			return left;
+		}
+		else
+		{
+			return right;
+		}
+	}
+}
+void QuickSort2(int* arr, int left, int right)
+{
+	if (left >= right)return;
+	int begin = left;
+	int end = right;
+	int midi = GetMidNum(arr, left, right);
+	swap(arr[midi], arr[left]);
+	int key = arr[left];
+	int hole = left;
+	while (left < right)
+	{
+		while (left < right && arr[right] >= key)right--;
+		arr[hole] = arr[right];
+		hole = right;
+		while (left < right && arr[left] <= key)left++;
+		arr[hole] = arr[left];
+		hole = left;
+	}
+	arr[hole] = key;
+	QuickSort2(arr, begin, hole - 1);
+	QuickSort2(arr, hole + 1, end);
+}
+
+void QuickSort3(int* arr, int left, int right)
+{
+	if (left >= right)return;
+	int midi = GetMidNum(arr, left, right);
+	swap(arr[midi], arr[left]);
+	int prev = left;
+	int cur = left + 1;
+	while (cur <= right)
+	{
+		if (arr[cur] < arr[left] && ++prev != cur)
+		{
+			swap(arr[cur], arr[prev]);
+		}
+		cur++;
+	}
+	swap(arr[left], arr[prev]);
+	QuickSort3(arr, left, prev - 1);
+	QuickSort3(arr, prev + 1, right);
 
 }
 int main()
 {
-	int arr[] = { 9,8,7,6,5,4,3,3,3,2,1,0 };
+	int arr[] = {6,6,6,6,2, 9,8,7,6,5 ,-9,-1,100,100,-1000};
 	/*PrintArray(arr, sizeof(arr) / sizeof(arr[0]));
 	InsertSort(arr, sizeof(arr) / sizeof(arr[0]));
 	PrintArray(arr, sizeof(arr) / sizeof(arr[0]));*/
 	PrintArray(arr, sizeof(arr) / sizeof(arr[0]));
-	QuickSort(arr, 0, sizeof(arr) / sizeof(arr[0]) - 1);
+	QuickSort3(arr, 0, sizeof(arr) / sizeof(arr[0]) - 1);
 	PrintArray(arr, sizeof(arr) / sizeof(arr[0]));
 	return 0;
 }
