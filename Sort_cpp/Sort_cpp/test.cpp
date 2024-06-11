@@ -1,5 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include <iostream>
+#include <utility>
+#include <stack>
 using namespace std;
 void PrintArray(int* arr, int n)
 {
@@ -197,14 +199,39 @@ void QuickSort3(int* arr, int left, int right)
 }
 int PartSort(int* arr, int left, int right)
 {
-	int mid = (left + right) / 2;
-
+	int begin = left;
+	int end = right;
+	int midi = GetMidNum(arr, left, right);
+	swap(arr[midi], arr[left]);
+	int flagi = left;
+	while (left < right)
+	{
+		while (left < right && arr[right] >= arr[flagi])right--;
+		while (left < right && arr[left] <= arr[flagi])left++;
+		swap(arr[right], arr[left]);
+	}
+	swap(arr[left], arr[flagi]);
+	flagi = left;
+	return flagi;
 }
-////∑«µ›πÈ
-//void QuickSort(int* arr, int left, int right)
-//{
-//
-//}
+//∑«µ›πÈ
+void QuickSort4(int* arr, int left, int right)
+{
+	if (left >= right)return;
+	stack<pair<int, int>> st;
+	st.push(make_pair(left, right));
+	pair<int, int> range;
+	while (!st.empty())
+	{
+		range = st.top();
+		st.pop();
+		int flagi = PartSort(arr, range.first, range.second);
+		if (flagi + 1 < range.second)
+			st.push(make_pair(flagi + 1, range.second));
+		if (range.first < flagi - 1)
+			st.push(make_pair(range.first, flagi - 1));
+	}
+}
 void _MergeSort(int* arr, int left, int right, int* tmp)
 {
 	if (left >= right)return;
@@ -246,18 +273,19 @@ void MergeSort1(int* arr, int n)
 	_MergeSort(arr, 0, n - 1, tmp);
 	delete[] tmp;
 }
+//πÈ≤¢≈≈–Ú∑«µ›πÈ
 void MergeSort2(int* arr, int n)
 {
-
+	
 }
 int main()
 {
-	int arr[] = { 6,2, 9,8,7,6,5 ,11,-1,-8,-9,1000,-111 };
+	int arr[] = { 6,2, 9,8,7,6,5 ,11,-1,-8,-9,1000,-111 ,8,8,8,8,8};
 	/*PrintArray(arr, sizeof(arr) / sizeof(arr[0]));
 	InsertSort(arr, sizeof(arr) / sizeof(arr[0]));
 	PrintArray(arr, sizeof(arr) / sizeof(arr[0]));*/
 	PrintArray(arr, sizeof(arr) / sizeof(arr[0]));
-	MergeSort1(arr, sizeof(arr) / sizeof(arr[0]) );
+	QuickSort4(arr, 0, sizeof(arr) / sizeof(arr[0]) - 1);
 	PrintArray(arr, sizeof(arr) / sizeof(arr[0]));
 	return 0;
 }
