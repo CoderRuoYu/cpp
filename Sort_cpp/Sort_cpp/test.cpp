@@ -99,6 +99,7 @@ void BubbleSort(int* arr, int n)
 		}
 	}
 }
+//hore版本
 void QuickSort1(int* arr, int left, int right)
 {
 	if (left >= right)return;
@@ -151,6 +152,7 @@ int GetMidNum(int* arr, int left, int right)
 		}
 	}
 }
+//挖坑法
 void QuickSort2(int* arr, int left, int right)
 {
 	if (left >= right)return;
@@ -173,7 +175,7 @@ void QuickSort2(int* arr, int left, int right)
 	QuickSort2(arr, begin, hole - 1);
 	QuickSort2(arr, hole + 1, end);
 }
-
+//双指针法
 void QuickSort3(int* arr, int left, int right)
 {
 	if (left >= right)return;
@@ -192,16 +194,70 @@ void QuickSort3(int* arr, int left, int right)
 	swap(arr[left], arr[prev]);
 	QuickSort3(arr, left, prev - 1);
 	QuickSort3(arr, prev + 1, right);
+}
+int PartSort(int* arr, int left, int right)
+{
+	int mid = (left + right) / 2;
+
+}
+////非递归
+//void QuickSort(int* arr, int left, int right)
+//{
+//
+//}
+void _MergeSort(int* arr, int left, int right, int* tmp)
+{
+	if (left >= right)return;
+	int mid = (left + right) / 2;
+	_MergeSort(arr, left, mid, tmp);
+	_MergeSort(arr, mid + 1, right, tmp);
+	int begin1 = left;
+	int begin2 = mid + 1;
+	int cur = left;
+	while (begin1 <= mid && begin2 <= right)
+	{
+		if (arr[begin1] < arr[begin2])
+		{
+			tmp[cur++] = arr[begin1++];
+		}
+		else
+		{
+			tmp[cur++] = arr[begin2++];
+		}
+	}
+	while (begin1 <= mid)
+	{
+		tmp[cur++] = arr[begin1++];
+	}
+	while (begin2 <= right)
+	{
+		tmp[cur++] = arr[begin2++];
+	}
+	memcpy(arr + left, tmp + left, (right - left + 1) * sizeof(int));
+}
+void MergeSort1(int* arr, int n)
+{
+	int* tmp = new int[n];
+	if (tmp == nullptr)
+	{
+		perror("new fail");
+		return;
+	}
+	_MergeSort(arr, 0, n - 1, tmp);
+	delete[] tmp;
+}
+void MergeSort2(int* arr, int n)
+{
 
 }
 int main()
 {
-	int arr[] = {6,6,6,6,2, 9,8,7,6,5 ,-9,-1,100,100,-1000};
+	int arr[] = { 6,2, 9,8,7,6,5 ,11,-1,-8,-9,1000,-111 };
 	/*PrintArray(arr, sizeof(arr) / sizeof(arr[0]));
 	InsertSort(arr, sizeof(arr) / sizeof(arr[0]));
 	PrintArray(arr, sizeof(arr) / sizeof(arr[0]));*/
 	PrintArray(arr, sizeof(arr) / sizeof(arr[0]));
-	QuickSort3(arr, 0, sizeof(arr) / sizeof(arr[0]) - 1);
+	MergeSort1(arr, sizeof(arr) / sizeof(arr[0]) );
 	PrintArray(arr, sizeof(arr) / sizeof(arr[0]));
 	return 0;
 }
